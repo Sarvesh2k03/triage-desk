@@ -21,8 +21,6 @@ jobs:
           cache-dependency-path: server/package-lock.json
       - run: npm ci
       - run: npm run typecheck
-      # The suite needs no database or API key: Postgres runs in-process via
-      # pg-mem and the Anthropic client is stubbed.
       - run: npm run test:coverage
 
   web:

@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: triage-desk-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.7-flash
+      - key: CORS_ORIGIN
+        sync: false

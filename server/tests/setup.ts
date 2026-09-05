@@ -1,0 +1,12 @@
+process.env.NODE_ENV = 'test';
+process.env.PORT = '4000';
+process.env.DATABASE_URL = 'postgres://triage:triage@localhost:5432/triage_test';
+process.env.CORS_ORIGIN = 'http://localhost:5173';
+process.env.GEMINI_API_KEY = '';
+process.env.GEMINI_MODEL = 'gemini-3.7-flash';
+process.env.AI_REQUEST_TIMEOUT_MS = '8000';
+process.env.AI_WALL_CLOCK_TIMEOUT_MS = '20000';
+process.env.AI_CACHE_TTL_MS = '900000';
+process.env.AI_CACHE_MAX_ENTRIES = '500';
+process.env.AI_RATE_LIMIT_CAPACITY = '10';
+process.env.AI_RATE_LIMIT_REFILL_PER_MIN = '10';

@@ -1,0 +1,22 @@
+# Local Postgres for development. Production uses a hosted database
+# (see README -> Deployment); this file is only ever used on a laptop.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: triage-desk-db
+    environment:
+      POSTGRES_USER: triage
+      POSTGRES_PASSWORD: triage
+      POSTGRES_DB: triage
+    ports:
+      - '5432:5432'
+    volumes:
+      - triage-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U triage -d triage']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  triage-db-data:

@@ -6,7 +6,10 @@ services:
     name: triage-desk
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build
+    # --include=dev is required: NODE_ENV=production below makes npm ci skip
+    # devDependencies, and the build needs TypeScript and Vite, which live
+    # there. Runtime is unaffected -- only dist/ is served.
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:

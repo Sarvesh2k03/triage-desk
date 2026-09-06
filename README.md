@@ -90,4 +90,17 @@ The server suite uses an in-memory Postgres-compatible database, so tests do not
 
 ## Deployment
 
-Use a hosted Postgres database such as Neon, Render Postgres, or Supabase for `DATABASE_URL`. Deploy the API with the `server` folder and the web app with the `web` folder. Set `GEMINI_API_KEY`, `GEMINI_MODEL`, `DATABASE_URL`, and `CORS_ORIGIN` in the API host environment.
+### One-Click Vercel Deploy
+
+Import the GitHub repo into Vercel and keep the project root as the repository root. Vercel uses `vercel.json` to build `web/dist` and serve the Express API from `/api`.
+
+Required environment variables:
+
+```bash
+DATABASE_URL=postgresql://...neon.tech/neondb?sslmode=require
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-3.7-flash
+CORS_ORIGIN=*
+```
+
+Use a hosted Postgres database such as Neon, Render Postgres, or Supabase for `DATABASE_URL`. Deploy the repo to Vercel as one project. Set `DATABASE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, and `CORS_ORIGIN` in Vercel. Use `CORS_ORIGIN=*` for a single-domain Vercel deployment, or set it to your production Vercel URL.

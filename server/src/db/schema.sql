@@ -1,4 +1,3 @@
--- Triage Desk schema. Idempotent: safe to run on every boot.
 CREATE TABLE IF NOT EXISTS tickets (
   id              UUID PRIMARY KEY,
   title           TEXT NOT NULL,
@@ -19,7 +18,6 @@ CREATE TABLE IF NOT EXISTS tickets (
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- The list view filters on status/priority and always sorts newest-first.
 CREATE INDEX IF NOT EXISTS tickets_created_at_idx ON tickets (created_at DESC);
 CREATE INDEX IF NOT EXISTS tickets_status_idx ON tickets (status);
 CREATE INDEX IF NOT EXISTS tickets_priority_idx ON tickets (priority);

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { TICKET_CATEGORIES, TICKET_PRIORITIES, TICKET_STATUSES } from '../types/ticket';
+import type { CreateTicketInput, UpdateTicketInput } from '../types/ticket';
 
 const title = z.string().trim().min(3, 'title must be at least 3 characters').max(160);
 const description = z.string().trim().min(10, 'description must be at least 10 characters').max(5_000);
@@ -43,6 +44,6 @@ export const ticketIdParamSchema = z.object({
   id: z.string().uuid('ticket id must be a UUID'),
 });
 
-export type CreateTicketBody = z.infer<typeof createTicketSchema>;
-export type UpdateTicketBody = z.infer<typeof updateTicketSchema>;
+export type CreateTicketBody = CreateTicketInput;
+export type UpdateTicketBody = UpdateTicketInput;
 export type ListTicketsQuery = z.infer<typeof listTicketsQuerySchema>;

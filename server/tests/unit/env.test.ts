@@ -8,9 +8,9 @@ describe('parseEnv', () => {
     expect(env).toMatchObject({
       NODE_ENV: 'development',
       PORT: 4000,
-      GEMINI_MODEL: 'gemini-3.7-flash',
-      AI_REQUEST_TIMEOUT_MS: 8_000,
-      AI_WALL_CLOCK_TIMEOUT_MS: 20_000,
+      GEMINI_MODEL: 'gemini-3.1-flash-lite',
+      AI_REQUEST_TIMEOUT_MS: 15_000,
+      AI_WALL_CLOCK_TIMEOUT_MS: 25_000,
     });
     expect(env.GEMINI_API_KEY).toBeUndefined();
   });

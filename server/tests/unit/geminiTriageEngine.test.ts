@@ -51,9 +51,24 @@ describe('GeminiTriageEngine', () => {
     expect(request.headers['x-goog-api-key']).toBe('k');
     expect(body.systemInstruction.parts[0].text).toBe(TRIAGE_SYSTEM_PROMPT);
     expect(body.generationConfig.responseMimeType).toBe('application/json');
-    expect(body.generationConfig.responseJsonSchema.required).toEqual(['category', 'priority', 'summary']);
+    expect(body.generationConfig.responseSchema.required).toEqual(['category', 'priority', 'summary']);
     expect(body.contents[0].parts[0].text).toContain('Slow exports');
     expect(body.contents[0].parts[0].text).toContain('Reports take minutes.');
+  });
+
+  // Regression guard. The current Gemini models are routed on v1 only; asking
+  // v1beta for one returns a bodyless 404 that reads like a bad API key, and
+  // the triage fallback then hides the failure completely. This assertion is
+  // the cheapest way to stop that recurring.
+  it('calls the v1 endpoint, never v1beta', async () => {
+    const fetcher = jest.fn().mockResolvedValue(httpResponse(okBody()));
+    const engine = new GeminiTriageEngine({ apiKey: 'k', fetcher });
+
+    await engine.classify({ title: 't', description: 'd' });
+
+    const [url] = fetcher.mock.calls[0]!;
+    expect(url).toMatch(/^https:\/\/generativelanguage\.googleapis\.com\/v1\/models\//);
+    expect(url).not.toContain('v1beta');
   });
 
   it('wraps the ticket in delimiters so its text cannot read as instructions', async () => {

@@ -1,8 +1,10 @@
+# One web service serving the API and the built frontend from a single origin.
+# The database lives on Neon's free tier; paste its connection string into
+# DATABASE_URL when Render prompts for it.
 services:
   - type: web
-    name: triage-desk-api
+    name: triage-desk
     runtime: node
-    rootDir: server
     plan: free
     buildCommand: npm ci && npm run build
     startCommand: npm start
@@ -10,11 +12,9 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # sync:false makes Render prompt for these rather than storing secrets
+      # in version control.
       - key: DATABASE_URL
         sync: false
       - key: GEMINI_API_KEY
-        sync: false
-      - key: GEMINI_MODEL
-        value: gemini-3.7-flash
-      - key: CORS_ORIGIN
         sync: false

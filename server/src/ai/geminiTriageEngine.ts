@@ -44,7 +44,10 @@ const GEMINI_TRIAGE_SCHEMA = {
     summary: { type: 'string' },
   },
   required: ['category', 'priority', 'summary'],
-  additionalProperties: false,
+  // No `additionalProperties` here: Gemini's responseSchema is OpenAPI-flavoured,
+  // not full JSON Schema, and rejects the field with a 400. Unknown keys are
+  // handled where it actually matters anyway -- TriageService re-parses the
+  // response with Zod, which strips anything it did not ask for.
   propertyOrdering: ['category', 'priority', 'summary'],
 };
 
@@ -100,7 +103,10 @@ export class GeminiTriageEngine implements TriageEngine {
   }
 
   private url(): string {
-    return `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(this.model)}:generateContent`;
+    // v1, not v1beta: the current Gemini models are only routed on v1, and
+    // calling v1beta for one returns a bodyless 404 that is easy to misread
+    // as a bad API key.
+    return `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(this.model)}:generateContent`;
   }
 
   private requestBody(input: TriageEngineInput): object {
@@ -109,9 +115,18 @@ export class GeminiTriageEngine implements TriageEngine {
       contents: [{ role: 'user', parts: [{ text: buildTriagePrompt(input.title, input.description) }] }],
       generationConfig: {
         temperature: 0.2,
-        maxOutputTokens: 256,
+        // Thinking tokens count against this budget. 256 was enough for the
+        // answer but not for the reasoning in front of it, so the response
+        // was being truncated before it emitted any JSON.
+        maxOutputTokens: 2048,
         responseMimeType: 'application/json',
-        responseJsonSchema: GEMINI_TRIAGE_SCHEMA,
+        // `responseSchema` on v1; the `responseJsonSchema` spelling belongs to
+        // v1beta and is silently ignored here, which lets the model reply with
+        // prose instead of the object we asked for.
+        responseSchema: GEMINI_TRIAGE_SCHEMA,
+        // This is a six-way classification. Reasoning buys nothing and is the
+        // difference between a ~1s call and a timeout.
+        thinkingConfig: { thinkingBudget: 0 },
       },
     };
   }
@@ -123,7 +138,11 @@ export class GeminiTriageEngine implements TriageEngine {
 
     const candidate = payload.candidates?.[0];
     if (!candidate) throw new Error('Gemini returned no candidates');
-    if (candidate.finishReason && !['STOP', 'MAX_TOKENS'].includes(candidate.finishReason)) {
+    // MAX_TOKENS is a failure, not a success: the response was cut off
+    // mid-object, so parsing it would either throw or, worse, yield a
+    // half-populated result. Treat it as unavailable and let the caller fall
+    // back to a complete answer.
+    if (candidate.finishReason && candidate.finishReason !== 'STOP') {
       throw new Error(`Gemini finished with ${candidate.finishReason}`);
     }
 

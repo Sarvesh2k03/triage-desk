@@ -2,17 +2,16 @@
   "name": "triage-desk",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "server",
-    "web"
-  ],
+  "workspaces": ["server", "web"],
   "scripts": {
-    "build": "npm --workspace web run build",
+    "build": "npm --workspace web run build && npm --workspace server run build",
+    "start": "npm --workspace server run start",
     "dev": "npm --workspace server run dev",
     "test": "npm --workspace server test",
+    "test:coverage": "npm --workspace server run test:coverage",
     "typecheck": "npm --workspace server run typecheck && npm --workspace web run typecheck"
   },
   "engines": {
-    "node": "24.x"
+    "node": ">=20"
   }
 }
